@@ -6,6 +6,7 @@ use Belajar\App\View;
 use Belajar\Config\Database;
 use Belajar\Repository\UserRepository;
 use Belajar\Service\Auth\CurrentLoginService;
+use Exception;
 
 class HomeController
 {
@@ -21,30 +22,39 @@ class HomeController
 
     public function index() {
 
-        $this->currentLogin->validate();
+        try {
+            $this->currentLogin->validate();
         
-        $payload = $this->currentLogin->payload;
-        
-        if ($payload!= null) {
-           
-            $userId = $payload['user_id'];
+            $payload = $this->currentLogin->payload;
             
-            $user = $this->userRespository->findById($userId);
+            if ($payload != null) {
+                // header('refresh: 0');
+            
+                $userId = $payload['user_id'];
+                
+                $user = $this->userRespository->findById($userId);
 
-            View::render('/Home/index', [
-                "title" => "Dashboard",
-                "user" => [
-                    "name" => $user->name ?? ''
-                ]
-            ]);
+                View::render('/Home/index', [
+                    "title" => "Dashboard",
+                    "user" => [
+                        "name" => $user->name ?? ''
+                    ]
+                ]);
 
 
-        } else {
-            header('refresh: 0');
+            } else {
+                View::render('Home/index', [
+                    "title" => "Login"
+                ]);
+            }
+        } catch (Exception $ex) {
             View::render('Home/index', [
-                "title" => "Dashboard"
+                "title" => "Login",
+                'error' => $ex->getMessage()
             ]);
         }
+
+        
 
         
             

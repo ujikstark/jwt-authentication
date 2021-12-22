@@ -10,7 +10,7 @@ use Belajar\Controller\Auth\LogoutController;
 use Belajar\Controller\Auth\RegisterController;
 
 
-Database::getConnection('prod');
+Database::getConnection('test');
 
 // Home Controller
 Router::add('GET', '/', HomeController::class, 'index', []);

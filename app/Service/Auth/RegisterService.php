@@ -26,7 +26,7 @@ class RegisterService {
             Database::beginTransaction();
             
             
-            $user = $this->userRepository->findById($request->id);
+            $user = $this->userRepository->findByUsername($request->username);
 
             if ($user != null){
                 throw new ValidationException("User already exists");

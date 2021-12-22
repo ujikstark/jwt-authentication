@@ -4,7 +4,7 @@ function getDatabaseConfig(): array {
     return [
         "database" => [
             "test" => [
-                "url" => "mysql:host=ujik.test;dbname=auth_db",
+                "url" => "mysql:host=ujik.test;dbname=auth_test_db",
                 "username" => "root",
                 "password" => "password"
             ],

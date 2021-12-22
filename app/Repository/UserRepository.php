@@ -94,28 +94,6 @@ class UserRepository
         
     }
 
-    public function findByToken(?string $token): ?string {
-
-        if ($token != null) {
-            $statement = $this->connection->prepare("SELECT * FROM refresh_tokens WHERE refresh_token = ?");
-            $statement->execute([$token]);
-
-            try {
-                if ($row = $statement->fetch()) {
-                    
-                    return $row['user_id'];
-                } else {
-                    return null;
-                }
-            } finally {
-                $statement->closeCursor();
-            }
-        } else {
-            return null;
-        }
-        
-        
-    }
 
     public function deleteAll(): void {
         $this->connection->exec("DELETE from users");

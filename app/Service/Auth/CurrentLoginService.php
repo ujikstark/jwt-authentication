@@ -41,18 +41,25 @@ class CurrentLoginService {
             
             if (!$isExpired) {
                 $user = $this->userRepository->findById(json_decode($payload)->user_id);
-                
-                // build a signature based on the header and payload using the secret
-                $base64_url_header = JWT::urlsafeB64Encode($header);
-                $base64_url_payload = JWT::urlsafeB64Encode($payload);
-                $newSignature = hash_hmac('SHA256', $base64_url_header . "." . $base64_url_payload, $user->secretKey, true);
-                $base64_url_signature = JWT::urlsafeB64Encode($newSignature);
-                
-                
-                if ($base64_url_signature == $signature) {
-                    $this->payload = json_decode($payload, true);
-                    return true;
-                } 
+
+                if ($user != null) {
+                     
+                    if ($this->verify($header, $payload, $signature, $user->secretKey)) {
+
+                        $newPayload = [
+                            "user_id" => $user->id,
+                            "role" => 'customer',
+                            "exp" => time() + 60 * 2
+                        ];
+                        
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                } else {
+                    return false;
+                }
                 
             } 
             
@@ -87,36 +94,56 @@ class CurrentLoginService {
             if (!$isExpired) {
                 $user = $this->userRepository->findById(json_decode($payload)->user_id);
                 
-                // build a signature based on the header and payload using the secret
-                $base64_url_header = JWT::urlsafeB64Encode($header);
-                $base64_url_payload = JWT::urlsafeB64Encode($payload);
-                $newSignature = hash_hmac('SHA256', $base64_url_header . "." . $base64_url_payload, $user->secretKey, true);
-                $base64_url_signature = JWT::urlsafeB64Encode($newSignature);
-                
-                
-                if ($base64_url_signature == $signature) {
+                if ($user != null) {
+                    
+                    
+                    
+                    if ($this->verify($header, $payload, $signature, $user->secretKey)) {
 
-                    $newPayload = [
-                        "user_id" => $user->id,
-                        "role" => 'customer',
-                        "exp" => time() + 60 * 2
-                    ];
-        
-        
-                    // JWT 
-                    $accessToken = JWT::encode($newPayload, $user->secretKey, 'HS256');
-                    setcookie('access_token', $accessToken, time() + 60, '/');
+                        $newPayload = [
+                            "user_id" => $user->id,
+                            "role" => 'customer',
+                            "exp" => time() + 60 * 2
+                        ];
+            
+            
+                        // JWT 
+                        $accessToken = JWT::encode($newPayload, $user->secretKey, 'HS256');
+                        setcookie('access_token', $accessToken, time() + 60, '/');
 
-                    $this->payload = $newPayload;
-                    return true;
-                } 
+                        $this->payload = $newPayload;
+                        return true;
+                    } 
+                } else {
+                    return false;
+                }   
+
+                
                 
             } 
             
 
        } else {
-           throw new Exception("doesn't have access token you need login");
+           throw new Exception("doesn't have access token, you need login");
        }
+    }
+
+
+    // verify jwt
+    public function verify(string $header, string $payload, string $signature, string $secretKey) {
+
+        // build a signature based on the header and payload using the secret
+
+        $base64_url_header = JWT::urlsafeB64Encode($header);
+        $base64_url_payload = JWT::urlsafeB64Encode($payload);
+        $newSignature = hash_hmac('SHA256', $base64_url_header . "." . $base64_url_payload, $secretKey, true);
+        $base64_url_signature = JWT::urlsafeB64Encode($newSignature);
+
+        if ($base64_url_signature == $signature) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

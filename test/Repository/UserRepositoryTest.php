@@ -47,6 +47,13 @@ class UserRepositoryTest extends TestCase
         self::assertNull($user);
     }
 
+    public function testFindByUsernameNotFound()
+    {
+        $user = $this->userRepository->findByUsername("notfound");
+
+        self::assertNull($user);
+    }
+
     public function testUpdate()
     {
         $user = new User();
