@@ -1,0 +1,16 @@
+{
+    "require": {
+        "phpunit/phpunit": "^9.5",
+        "firebase/php-jwt": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Belajar\\" : "app"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Belajar\\" : "test"
+        }
+    }
+}
